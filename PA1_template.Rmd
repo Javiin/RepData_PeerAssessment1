@@ -1,25 +1,55 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
 ---
 
 
 ## Loading and preprocessing the data
+library(ggplot2)
+library(plyr)
+library(readxl)
 
+activity <- read.csv("activity.csv")
 
 
 ## What is mean total number of steps taken per day?
+steps_day <- aggregate(steps ~ date, activity, sum)
+hist(steps_day$steps, main = paste("Total Steps Per Day"), col = "green", xlab = "Number of steps")
 
+total_mean <- mean(steps_day$steps)
+total_median <- median(steps_day$steps)
 
 
 ## What is the average daily activity pattern?
-
+step_interval <- aggregate(steps ~ interval, activity, mean)
+plot(step_interval$interval, step_interval$steps, type= "l", xlab = "Interval", ylab = "Number of Steps",
+     main = "Average Number of Steps per Day by Interval")
+maximumsteps <- step_interval[which.max(step_interval$steps), 1]
 
 
 ## Imputing missing values
+missing_data <- nrow(activity[!is.na(activity$steps), ])
+
+Complete_data <- transform(activity, steps = ifelse(is.na(activity$steps), step_interval$steps[match(activity$interval, step_interval$interval)],activity$steps))
+
+Complete_data[as.character(Complete_data$date) == "2012-10-01", 1] <- 0
+
+step_com_day <- aggregate(steps ~ date, Complete_data, sum)
+
+hist(step_com_day$steps, main = paste("Total Steps Each Day"), col = "red", xlab = "Number of steps")
+hist(steps_day$steps, main = paste("Total Steps Per Day - Missing values"), col = "green", xlab = "Number of Steps", add = T)
+legend("topright", c("Complete", "Incomplete"), col = c("red", "green"), lwd = 10)
+
+Com_mean <- mean(step_com_day$steps)
+com_median <- median(step_com_day$steps)
 
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+ay <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+
+Complete_data$Type <- as.factor(ifelse(is.element(weekdays(as.Date(Complete_data$date)), day), "Weekday", "Weekend"))
+
+step_variation <- aggregate(steps ~ interval + Type, Complete_data, mean)
+
+ggplot(step_variation, aes(x = interval, y = steps, color = Type)) +geom_line() + labs(title = "Average Daily steps by day type", x = "Interval", y = "No of steps") +
+  facet_wrap(~Type, ncol = 1, nrow = 2)
