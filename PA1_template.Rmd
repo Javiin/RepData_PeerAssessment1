@@ -13,7 +13,7 @@ activity <- read.csv("activity.csv")
 
 ## What is mean total number of steps taken per day?
 steps_day <- aggregate(steps ~ date, activity, sum)
-hist(steps_day$steps, main = paste("Total Steps Per Day"), col = "green", xlab = "Number of steps")
+hist(steps_day$steps, main = paste("Total Steps Per Day"), col = "blue", xlab = "Number of steps")
 
 total_mean <- mean(steps_day$steps)
 total_median <- median(steps_day$steps)
@@ -36,8 +36,8 @@ Complete_data[as.character(Complete_data$date) == "2012-10-01", 1] <- 0
 step_com_day <- aggregate(steps ~ date, Complete_data, sum)
 
 hist(step_com_day$steps, main = paste("Total Steps Each Day"), col = "red", xlab = "Number of steps")
-hist(steps_day$steps, main = paste("Total Steps Per Day - Missing values"), col = "green", xlab = "Number of Steps", add = T)
-legend("topright", c("Complete", "Incomplete"), col = c("red", "green"), lwd = 10)
+hist(steps_day$steps, main = paste("Total Steps Per Day - Missing values"), col = "blue", xlab = "Number of Steps", add = T)
+legend("topright", c("Complete", "Incomplete"), col = c("red", "blue"), lwd = 10)
 
 Com_mean <- mean(step_com_day$steps)
 com_median <- median(step_com_day$steps)
